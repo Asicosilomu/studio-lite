@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Studio Lite alpha-1</title>
+        <link rel="stylesheet" href="./app/thirdparty/7.css" />
+        <link rel="stylesheet" href="./app/app.css" />
+        <link rel="stylesheet" href="./app/thirdparty/jstree/style.min.css" />
+        <script src="./app/thirdparty/jstree/jquery.min.js"></script>
+        <script src="./app/thirdparty/jstree/jstree.min.js"></script>
+    </head>
+    <body>
+        <div class="title-bar active">
+            <div class="title-bar-text title-bar-icon icon-studio">Studio Lite (alpha-1)</div>
+            <div class="title-bar-controls" style="margin-right: 5px;">
+                <form action="https://github.com/asicosilomu/studio-lite">
+                    <button type="submit" aria-label="Minimize" class="github">GitHub</button>
+                </form>
+            </div>
+            <div class="title-bar-controls">
+                <button aria-label="Minimize"></button>
+                <button aria-label="Restore"></button>
+                <button aria-label="Close"></button>
+            </div>
+        </div>
+        <ul role="menubar" class="can-hover">
+            <li role="menuitem" tabindex="0" aria-haspopup="true">
+                File
+                <ul role="menu">
+                    <li role="menuitem" id="menuitem-renderimage"><a>Render image...</a></li>
+                    <li role="menuitem" id="menuitem-missingassets"><a>Missing assets...</a></li>
+                    <li role="menuitem" id="menuitem-reload"><a>Reload</a></li>
+                </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true">
+                Edit
+                <ul role="menu">
+                    <li role="menuitem" id="menuitem-zoomto"><a>Zoom to <span>F</span></a></li>
+                </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true">
+                View
+                <ul role="menu">
+                    <li role="menuitem" class="has-divider">
+                        <input type="checkbox" id="menuitem-skybox" checked>
+                        <label for="menuitem-skybox">Render skybox</label>
+                    </li>
+                    <li role="menuitem">
+                        <input type="checkbox" id="menuitem-stats">
+                        <label for="menuitem-stats">Stats</label>
+                    </li>
+                    <li role="menuitem">
+                        <input type="checkbox" id="menuitem-axes">
+                        <label for="menuitem-axes">Axes Helper</label>
+                    </li>
+                    <li role="menuitem">
+                        <input type="checkbox" id="menuitem-hoverbox" checked>
+                        <label for="menuitem-hoverbox">Outline on Hover</label>
+                    </li>
+                    <li role="menuitem">
+                        <input type="checkbox" id="menuitem-selectionbox" checked>
+                        <label for="menuitem-selectionbox">Outline on Select</label>
+                    </li>
+                </ul>
+            </li>
+            <li role="menuitem" tabindex="0" aria-haspopup="true">
+                Help
+                <ul role="menu">
+                    <li role="menuitem" id="menuitem-changelog"><a>View Changelog</a></li>
+                    <li role="menuitem" id="menuitem-about"><a>About Studio Lite</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="message" style="display: none"><span></span></div>
+        <div class="onboarding" style="display: none">
+            <h1>Welcome to Studio Lite (alpha-1)!</h1>
+            <button>Load file from server</button>
+            <h1>or</h1>
+            <label for="browse">Open from your computer &#40;binary RBXL/RBXM only&#41;</label>
+            <input type="file" id="browse">
+            <h4 style="margin-top: 50px; margin-bottom: 0;">This is alpha software!</h4>
+            <span>Please treat it as such! Don't expect stability or completeness.</span>
+            <span>Make sure to report any issues you find :&#41;</span>
+        </div>
+        <div class="editor" style="display: none"></div>
+        <div class="rightPane">
+            <div class="window glass active">
+                <div class="title-bar">
+                    <div class="title-bar-text">Explorer</div>
+                </div>
+                <div class="window-body">
+                    <menu role="tablist">
+                        <button role="tab" aria-controls="datamodel-explorer" aria-selected="true" disabled>DataModel</button>
+                        <button role="tab" aria-controls="scene-explorer" disabled>THREE.js Scene</button>
+                    </menu>
+                    <article id="datamodel-explorer" class="tree"></article>
+                    <article id="scene-explorer" class="tree2" style="display: none;"></article>
+                </div>
+            </div>
+            <div class="window glass active">
+                <div class="title-bar">
+                    <div class="title-bar-text" id="propertiesTitle">Properties</div>
+                </div>
+                <div class="properties window-body"><span class="loader animate" style="display: none;"></span><table><tbody></tbody></table></div>
+            </div>
+        </div>
+        <div class="console window glass active">
+            <div class="title-bar">
+                <div class="title-bar-text">Console</div>
+            </div>
+            <div class="log window-body"></div>
+        </div>
+        <div class="status-bar">
+            <p class="status-bar-field status">Ready</p>
+            <div class="status-bar-field flexcenter"><div role="progressbar" class="animate"></div></div>
+        </div>
+        <dialog id="remoteload">
+            <div class="window glass active is-bright">
+                <div class="title-bar">
+                    <div class="title-bar-text" id="dialog-title">Load from server</div>
+                    <div class="title-bar-controls">
+                        <button aria-label="Close" class="close"></button>
+                    </div>
+                </div>
+                <div class="window-body has-space">
+                    <h2 class="instruction instruction-primary">Enter the path to an RBXL file on the server...</h2>
+                    <input type="text" id="remotepath" style="width: 100%;" autofocus>
+                    <br><br>
+                    <h2 class="instruction instruction-primary">...or click an example below.</h2>
+                    <ul role="listbox" class="has-hover" id="examples">
+                    </ul>
+                </div>
+                <footer style="text-align: right">
+                    <button class="open" disabled>Open</button>
+                    <button class="cancel">Cancel</button>
+                </footer>
+            </div>
+        </dialog>
+        <dialog id="about">
+            <div class="window glass active is-bright">
+                <div class="title-bar">
+                    <div class="title-bar-text" id="dialog-title">About Studio Lite</div>
+                    <div class="title-bar-controls">
+                        <button aria-label="Close" class="close"></button>
+                    </div>
+                </div>
+                <div class="window-body has-space">
+                    Studio Lite by Asicosilomu<br>
+                    Version alpha-1<br><br>
+                    This project is made possible by multiple open source libraries.<br>
+                    See notice for more information.<br><br>
+                    Roblox Studio icons are Copyright &copy; Roblox Corporation.<br>
+                    Studio Lite is not affiliated with or endorsed by Roblox Corporation.
+                </div>
+                <footer style="text-align: right">
+                    <button class="view-notice">View notice</button>
+                    <button class="ok">OK</button>
+                </footer>
+            </div>
+        </dialog>
+        <dialog id="render">
+            <div class="window glass active is-bright">
+                <div class="title-bar">
+                    <div class="title-bar-text" id="dialog-title">Render image</div>
+                    <div class="title-bar-controls">
+                        <button aria-label="Close" class="close"></button>
+                    </div>
+                </div>
+                <div class="window-body has-space">
+                    <p>Click the button below to render an image of the viewport.</p>
+                    <button id="dorender">Render</button>
+                    <br>
+                    <span>Image resolution: <input type="number" id="renderwidth" /> x <input type="number" id="renderheight" /></span>
+                    <p>Your image will appear below, right click to save.</p>
+                    <img alt="Rendered image" style="max-width: 80vw; max-height: 70vh;" />
+                </div>
+                <footer style="text-align: right">
+                    <button class="ok">Close</button>
+                </footer>
+            </div>
+        </dialog>
+        <dialog id="notepad">
+            <div class="window glass active is-bright">
+                <div class="title-bar">
+                    <div class="title-bar-text" id="dialog-title">Notepad</div>
+                    <div class="title-bar-controls">
+                        <button aria-label="Minimize"></button>
+                        <button aria-label="Maximize"></button>
+                        <button aria-label="Close" class="close"></button>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <ul role="menubar">
+                        <li role="menuitem" tabindex="0">File</li>
+                        <li role="menuitem" tabindex="0">Edit</li>
+                        <li role="menuitem" tabindex="0">Format</li>
+                        <li role="menuitem" tabindex="0">View</li>
+                        <li role="menuitem" tabindex="0">Help</li>
+                    </ul>
+                    <textarea readonly></textarea>
+                </div>
+            </div>
+        </dialog>
+        <script src="./app/app.js" type="module"></script>
+    </body>
+</html>
